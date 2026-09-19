@@ -1,6 +1,7 @@
-import type { RuleId } from "@/rules/types.js";
+import { SEVERITY } from "./consts";
+
+import type { RuleId } from "@/rules/types";
 import type { Brand } from "@/types";
-import type { SEVERITY } from "./consts.js";
 
 export type Severity = (typeof SEVERITY)[keyof typeof SEVERITY];
 

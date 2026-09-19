@@ -2,4 +2,4 @@
  * Command exports for tsxray
  */
 
-export { createScanCommand } from "./scan.js";
+export { createScanCommand } from "./scan";

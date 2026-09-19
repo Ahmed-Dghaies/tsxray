@@ -2,9 +2,10 @@
  * TypeScript project loader for tsxray
  */
 
-import { Project, SourceFile } from "ts-morph";
-import * as path from "path";
 import * as fs from "fs";
+import * as path from "path";
+
+import { Project, SourceFile } from "ts-morph";
 
 export interface LoadedProject {
   project: Project;

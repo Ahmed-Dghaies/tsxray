@@ -3,7 +3,8 @@
  */
 
 import * as fs from "fs";
-import type { FindingsResult } from "@/findings/types.js";
+
+import type { FindingsResult } from "@/findings/types";
 
 export function formatJson(result: FindingsResult, pretty = true): string {
   return pretty ? JSON.stringify(result, null, 2) : JSON.stringify(result);

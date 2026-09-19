@@ -2,12 +2,14 @@
  * Scan command for tsxray
  */
 
-import { Command } from "commander";
-import { scanProject } from "@/core/scanner.js";
-import { analyze } from "@/core/analyzer.js";
-import { printTerminal } from "@/reporters/terminal.js";
-import { formatJson, writeJsonToFile } from "@/reporters/json.js";
 import * as fs from "fs";
+
+import { Command } from "commander";
+
+import { analyze } from "@/core/analyzer";
+import { scanProject } from "@/core/scanner";
+import { formatJson, writeJsonToFile } from "@/reporters/json";
+import { printTerminal } from "@/reporters/terminal";
 
 export interface ScanCommandOptions {
   format?: "terminal" | "json";
@@ -21,7 +23,7 @@ export function createScanCommand(): Command {
     .argument("<path>", "Path to scan")
     .option("-f, --format <format>", "Output format (terminal, json)", "terminal")
     .option("-o, --output <file>", "Save output to file")
-    .option("-v, --verbose", "Verbose output", false)
+    .option("--no-verbose", "Hide detailed findings")
     .action(async (targetPath: string, options: ScanCommandOptions) => {
       await runScan(targetPath, options);
     });
@@ -30,7 +32,8 @@ export function createScanCommand(): Command {
 }
 
 async function runScan(targetPath: string, options: ScanCommandOptions): Promise<void> {
-  const { format = "terminal", output, verbose } = options;
+  const { format = "terminal", output, verbose = true } = options;
+  const logProgress = verbose && format === "terminal";
 
   try {
     // Check if path exists
@@ -39,7 +42,7 @@ async function runScan(targetPath: string, options: ScanCommandOptions): Promise
       process.exit(1);
     }
 
-    if (verbose) {
+    if (logProgress) {
       console.log(`[Scan] Scanning: ${targetPath}`);
       console.log(`[Scan] Format: ${format}`);
     }
@@ -47,13 +50,13 @@ async function runScan(targetPath: string, options: ScanCommandOptions): Promise
     // Scan
     const scanResult = scanProject(targetPath);
 
-    if (verbose) {
+    if (logProgress) {
       console.log(`[Scan] Found ${scanResult.summary.totalFiles} files`);
       console.log(`[Scan] Total lines: ${scanResult.summary.totalLines}`);
     }
 
     // Analyze
-    const analyzeResult = analyze(scanResult, { verbose });
+    const analyzeResult = analyze(scanResult, { verbose: logProgress });
 
     // Output
     switch (format) {

@@ -1,41 +1,29 @@
 import js from "@eslint/js";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import globals from "globals";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
-import tseslint from "typescript-eslint";
 import eslintPluginImportX from "eslint-plugin-import-x";
+import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   { ignores: ["dist"] },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintPluginImportX.flatConfigs.typescript,
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
-    },
-    plugins: {
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
-      "import-x": eslintPluginImportX,
+      globals: globals.node,
     },
     settings: {
-      "import-x/resolver": {
-        node: {
-          extensions: [".js", ".jsx", ".ts", ".tsx"],
-          paths: ["src"],
-        },
-        typescript: {
-          alwaysTryTypes: true,
+      "import-x/resolver-next": [
+        createTypeScriptImportResolver({
           project: "./tsconfig.json",
-        },
-      },
+        }),
+      ],
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-explicit-any": "off",
-      "jsx-a11y/click-events-have-key-events": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
@@ -51,22 +39,8 @@ export default tseslint.config(
       "import-x/order": [
         "error",
         {
-          groups: [
-            "builtin", // Node "fs", "path"
-            "external", // npm packages: react, react-hook-form...
-            "internal", // aliased modules like "@/features/..."
-            "parent", // ../
-            "sibling", // ./SomeFile
-            "index", // ./
-            "object", // import log = require("log") (rare)
-            "type", // import type { MyType } from ...
-          ],
+          groups: ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
           pathGroups: [
-            {
-              pattern: "react",
-              group: "external",
-              position: "before",
-            },
             {
               pattern: "@/**",
               group: "internal",

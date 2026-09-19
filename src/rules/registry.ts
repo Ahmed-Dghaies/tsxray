@@ -1,4 +1,4 @@
-import type { Rule, RuleConfig } from "./types.js";
+import type { Rule, RuleConfig } from "./types";
 
 class RuleRegistry {
   private rules = new Map<string, Rule>();

@@ -8,7 +8,7 @@
     "tsxray": "dist/cli/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --emitDeclarationOnly && esbuild src/cli/index.ts --bundle --platform=node --format=esm --target=node20 --outfile=dist/cli/index.js --sourcemap --packages=external",
     "start": "node dist/cli/index.js",
     "scan": "npm run build && node dist/cli/index.js scan",
     "test": "vitest",
@@ -16,16 +16,25 @@
     "dev": "tsx src/cli/index.ts",
     "publish": "npm run build && npm publish",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "check-circular-deps": "bash ./scripts/check_circular_deps.sh 0"
   },
   "dependencies": {
     "commander": "^11.0.0",
     "ts-morph": "^20.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "tsx": "^4.23.13",
-    "typescript": "^7.0.2",
+    "@eslint/js": "^9.28.0",
+    "@types/node": "^22.13.4",
+    "esbuild": "^0.28.2",
+    "eslint": "^9.33.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-import-x": "^4.16.1",
+    "globals": "^15.14.0",
+    "tsx": "^4.19.4",
+    "typescript": "~5.6.2",
+    "typescript-eslint": "^8.56.0",
     "vitest": "^5.0.1"
   }
 }

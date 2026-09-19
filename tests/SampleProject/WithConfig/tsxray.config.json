@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "no-large-functions": {
+      "enabled": true,
+      "options": {
+        "maxLines": 5
+      }
+    }
+  }
+}

@@ -3,8 +3,9 @@
  * Collects all source files from a project.
  */
 
+import { loadProject, getRelativePath, type LoadedProject } from "./project-loader";
+
 import type { SourceFile } from "ts-morph";
-import { loadProject, getRelativePath, type LoadedProject } from "./project-loader.js";
 
 export interface ScannedFile {
   sourceFile: SourceFile;

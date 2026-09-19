@@ -2,7 +2,7 @@
  * Terminal reporter for tsxray
  */
 
-import type { FindingsResult } from "@/findings/types.js";
+import type { FindingsResult } from "@/findings/types";
 
 const colors = {
   reset: "\x1b[0m",

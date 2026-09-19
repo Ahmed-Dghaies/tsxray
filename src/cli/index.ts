@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { createScanCommand } from "./commands/index.js";
+
+import { createScanCommand } from "./commands/index";
 
 const program = new Command();
 

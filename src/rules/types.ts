@@ -1,6 +1,6 @@
+import type { Finding } from "@/findings/types";
+import type { Brand } from "@/types/types";
 import type { SourceFile } from "ts-morph";
-import type { Finding } from "@/findings/types.js";
-import type { Brand } from "@/types/types.js";
 
 export interface RuleConfig {
   enabled: boolean;

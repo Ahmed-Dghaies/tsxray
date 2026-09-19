@@ -1,5 +1,10 @@
-import type { Finding, FindingsResult, Severity } from "@/findings/types.js";
-import type { ScanResult } from "@/core/scanner.js";
+import { isRuleDisabledForFile } from "@/rules/directives";
+import { builtInRules } from "@/rules/implementations/index";
+
+import { loadConfig } from "./config-loader";
+
+import type { ScanResult } from "@/core/scanner";
+import type { Finding, FindingsResult, Severity } from "@/findings/types";
 
 export interface AnalyzeOptions {
   verbose?: boolean;
@@ -11,18 +16,38 @@ export interface AnalyzeOptions {
 export function analyze(scanResult: ScanResult, options: AnalyzeOptions = {}): FindingsResult {
   const { verbose } = options;
   const findings: Finding[] = [];
+  const config = loadConfig(scanResult.rootPath);
 
   if (verbose) {
     console.log(`[Analyzer] Analyzing ${scanResult.files.length} files...`);
     console.log(`[Analyzer] Total lines: ${scanResult.summary.totalLines}`);
   }
 
-  // TODO: Run rules here
-  // For example:
-  // for (const file of scanResult.files) {
-  //   const fileFindings = checkNoLargeFunctions(file);
-  //   findings.push(...fileFindings);
-  // }
+  for (const file of scanResult.files) {
+    for (const rule of builtInRules) {
+      const configuredRule = config.rules?.[rule.id];
+      const enabled = configuredRule?.enabled ?? rule.defaultConfig.enabled;
+
+      if (!enabled || isRuleDisabledForFile(file.sourceFile, rule.id)) {
+        continue;
+      }
+
+      const result = rule.check({
+        sourceFile: file.sourceFile,
+        filePath: file.relativePath,
+        config: {
+          enabled,
+          options: {
+            ...rule.defaultConfig.options,
+            ...configuredRule?.options,
+          },
+        },
+        generateId: () => `${file.relativePath}:${rule.id}:${findings.length}`,
+      });
+
+      findings.push(...result.findings);
+    }
+  }
 
   // Build summary
   const summary = buildSummary(findings);
@@ -32,9 +57,15 @@ export function analyze(scanResult: ScanResult, options: AnalyzeOptions = {}): F
     findings,
     summary,
     scannedFiles,
-    timestamp: new Date().toISOString(),
+    timestamp: getTimestamp(),
     analyzedPath: scanResult.rootPath,
   };
+}
+
+function getTimestamp(): string {
+  const systemTime = process.env.TSXRAY_SYSTEM_TIME;
+
+  return systemTime ? new Date(systemTime).toISOString() : new Date().toISOString();
 }
 
 /**

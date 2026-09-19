@@ -58,7 +58,7 @@ Rules in tsxray follow a simple interface:
 
 ```typescript
 // src/rules/implementations/my-first-rule.ts
-import type { Rule, RuleContext, RuleResult } from "../types.js";
+import type { Rule, RuleContext, RuleResult } from "../types";
 
 export const myFirstRule: Rule = {
   id: "my-first-rule",
