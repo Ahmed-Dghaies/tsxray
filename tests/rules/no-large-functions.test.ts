@@ -1,3 +1,5 @@
+import { resolve } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { CliQuerier } from "../CliQuerier";
@@ -44,7 +46,7 @@ describe("no-large-functions rule via CLI scan", () => {
         "WithoutConfig/large-functions.ts",
       ],
       timestamp: "2026-09-01T10:00:00.000Z",
-      analyzedPath: "/Users/ahmeddghaies/Documents/GitHub/tsxray/tests/SampleProject",
+      analyzedPath: resolve("tests/SampleProject"),
     });
   });
 
@@ -91,7 +93,7 @@ describe("no-large-functions rule via CLI scan", () => {
       },
       scannedFiles: ["configurable-function.ts"],
       timestamp: "2026-09-01T10:00:00.000Z",
-      analyzedPath: "/Users/ahmeddghaies/Documents/GitHub/tsxray/tests/SampleProject/WithConfig",
+      analyzedPath: resolve("tests/SampleProject/WithConfig"),
     });
   });
 
@@ -128,8 +130,7 @@ describe("no-large-functions rule via CLI scan", () => {
         "large-functions.ts",
       ],
       timestamp: "2026-09-01T10:00:00.000Z",
-      analyzedPath:
-        "/Users/ahmeddghaies/Documents/GitHub/tsxray/tests/SampleProject/WithoutConfig",
+      analyzedPath: resolve("tests/SampleProject/WithoutConfig"),
     });
   });
 });
