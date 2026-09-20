@@ -14,6 +14,12 @@ export function booleanOption(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
+export function stringArrayOption(value: unknown, fallback: readonly string[]): string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string")
+    ? value
+    : [...fallback];
+}
+
 export function objectOption(
   value: unknown,
   fallback: Record<string, unknown> = {},

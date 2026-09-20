@@ -25,6 +25,8 @@ export function analyze(scanResult: ScanResult, options: AnalyzeOptions = {}): F
   }
 
   for (const file of scanResult.files) {
+    const fileFindingsStart = findings.length;
+
     for (const rule of builtInRules) {
       const configuredRule = config.rules?.[rule.id];
       const enabled = configuredRule?.enabled ?? rule.defaultConfig.enabled;
@@ -44,7 +46,8 @@ export function analyze(scanResult: ScanResult, options: AnalyzeOptions = {}): F
             ...configuredRule?.options,
           },
         },
-        generateId: () => `${file.relativePath}:${rule.id}:${findings.length}`,
+        generateId: () =>
+          `${file.relativePath}:${rule.id}:${findings.length - fileFindingsStart}`,
       });
 
       findings.push(...result.findings);

@@ -1,0 +1,1 @@
+export const consumedThroughBarrel = "used";
