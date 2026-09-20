@@ -1,5 +1,5 @@
 import type { Finding } from "@/findings/types";
-import type { Brand } from "@/types/types";
+import type { RULES } from "@/rules/constants";
 import type { SourceFile } from "ts-morph";
 
 export interface RuleConfig {
@@ -9,6 +9,7 @@ export interface RuleConfig {
 
 export interface RuleContext {
   sourceFile: SourceFile;
+  projectSourceFiles?: readonly SourceFile[];
   filePath: string;
   config: RuleConfig;
 
@@ -19,7 +20,7 @@ export interface RuleResult {
   findings: Finding[];
 }
 
-export type RuleId = Brand<string, "RuleId">;
+export type RuleId = (typeof RULES)[keyof typeof RULES];
 
 export interface Rule {
   id: RuleId;

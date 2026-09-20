@@ -1,9 +1,11 @@
-import { resolve } from "node:path";
-
 import { describe, expect, it } from "vitest";
+
+import { RULES } from "@/rules/constants";
 
 import { CliQuerier } from "../CliQuerier";
 import { useFakeTimers } from "../utilities";
+
+import type { FindingId } from "@/findings/types";
 
 const cliQuerier = new CliQuerier();
 
@@ -13,41 +15,24 @@ describe("no-large-functions rule via CLI scan", () => {
   it("Flags large functions in a real project fixture", () => {
     const result = cliQuerier.runScan("tests/SampleProject");
 
-    cliQuerier.validateScanFoundRules(result, ["no-large-functions"]);
-
-    expect(result).toStrictEqual({
-      findings: [
-        {
-          id: "WithoutConfig/large-functions.ts:large-func:0",
-          ruleId: "no-large-functions",
-          severity: "warning",
-          title: 'Function "longFunction" is too large (55 lines)',
-          message:
-            "Function has 55 lines, exceeds limit of 50. Consider extracting parts into helper functions.",
-          filePath: "WithoutConfig/large-functions.ts",
-          symbolName: "longFunction",
-          range: {
-            endColumn: 0,
-            endLine: 55,
-            startColumn: 0,
-            startLine: 1,
-          },
+    cliQuerier.validateScanFoundRules(result, "no-large-functions", [
+      {
+        id: "WithoutConfig/large-functions.ts:large-func:0" as FindingId,
+        ruleId: RULES.NO_LARGE_FUNCTIONS,
+        severity: "warning",
+        title: 'Function "longFunction" is too large (55 lines)',
+        message:
+          "Function has 55 lines, exceeds limit of 50. Consider extracting parts into helper functions.",
+        filePath: "WithoutConfig/large-functions.ts",
+        symbolName: "longFunction",
+        range: {
+          endColumn: 0,
+          endLine: 55,
+          startColumn: 0,
+          startLine: 1,
         },
-      ],
-      summary: {
-        total: 1,
-        bySeverity: { error: 0, warning: 1, info: 0, hint: 0 },
-        byRule: { "no-large-functions": 1 },
       },
-      scannedFiles: [
-        "WithConfig/configurable-function.ts",
-        "WithoutConfig/acceptable-functions.ts",
-        "WithoutConfig/disabled-large-function.ts",
-        "WithoutConfig/large-functions.ts",
-      ],
-      timestamp: "2026-09-01T10:00:00.000Z",
-      analyzedPath: resolve("tests/SampleProject"),
-    });
+    ]);
   });
 
   it("Shows detailed finding locations by default", () => {
@@ -67,70 +52,46 @@ describe("no-large-functions rule via CLI scan", () => {
   it("Uses options from tsxray.config.json", () => {
     const result = cliQuerier.runScan("tests/SampleProject/WithConfig");
 
-    expect(result).toStrictEqual({
-      findings: [
-        {
-          id: "configurable-function.ts:large-func:0",
-          ruleId: "no-large-functions",
-          severity: "warning",
-          title: 'Function "configurableFunction" is too large (7 lines)',
-          message:
-            "Function has 7 lines, exceeds limit of 5. Consider extracting parts into helper functions.",
-          filePath: "configurable-function.ts",
-          symbolName: "configurableFunction",
-          range: {
-            startLine: 1,
-            startColumn: 0,
-            endLine: 7,
-            endColumn: 0,
-          },
+    cliQuerier.validateScanFoundRules(result, "no-large-functions", [
+      {
+        id: "configurable-function.ts:large-func:0" as FindingId,
+        ruleId: RULES.NO_LARGE_FUNCTIONS,
+        severity: "warning",
+        title: 'Function "configurableFunction" is too large (7 lines)',
+        message:
+          "Function has 7 lines, exceeds limit of 5. Consider extracting parts into helper functions.",
+        filePath: "configurable-function.ts",
+        symbolName: "configurableFunction",
+        range: {
+          startLine: 1,
+          startColumn: 0,
+          endLine: 7,
+          endColumn: 0,
         },
-      ],
-      summary: {
-        total: 1,
-        bySeverity: { error: 0, warning: 1, info: 0, hint: 0 },
-        byRule: { "no-large-functions": 1 },
       },
-      scannedFiles: ["configurable-function.ts"],
-      timestamp: "2026-09-01T10:00:00.000Z",
-      analyzedPath: resolve("tests/SampleProject/WithConfig"),
-    });
+    ]);
   });
 
   it("Ignores a file when the rule is disabled by a file directive", () => {
     const result = cliQuerier.runScan("tests/SampleProject/WithoutConfig");
 
-    expect(result).toStrictEqual({
-      findings: [
-        {
-          id: "large-functions.ts:large-func:0",
-          ruleId: "no-large-functions",
-          severity: "warning",
-          title: 'Function "longFunction" is too large (55 lines)',
-          message:
-            "Function has 55 lines, exceeds limit of 50. Consider extracting parts into helper functions.",
-          filePath: "large-functions.ts",
-          symbolName: "longFunction",
-          range: {
-            endColumn: 0,
-            endLine: 55,
-            startColumn: 0,
-            startLine: 1,
-          },
+    cliQuerier.validateScanFoundRules(result, "no-large-functions", [
+      {
+        id: "large-functions.ts:large-func:0" as FindingId,
+        ruleId: RULES.NO_LARGE_FUNCTIONS,
+        severity: "warning",
+        title: 'Function "longFunction" is too large (55 lines)',
+        message:
+          "Function has 55 lines, exceeds limit of 50. Consider extracting parts into helper functions.",
+        filePath: "large-functions.ts",
+        symbolName: "longFunction",
+        range: {
+          endColumn: 0,
+          endLine: 55,
+          startColumn: 0,
+          startLine: 1,
         },
-      ],
-      summary: {
-        total: 1,
-        bySeverity: { error: 0, warning: 1, info: 0, hint: 0 },
-        byRule: { "no-large-functions": 1 },
       },
-      scannedFiles: [
-        "acceptable-functions.ts",
-        "disabled-large-function.ts",
-        "large-functions.ts",
-      ],
-      timestamp: "2026-09-01T10:00:00.000Z",
-      analyzedPath: resolve("tests/SampleProject/WithoutConfig"),
-    });
+    ]);
   });
 });

@@ -1,20 +1,10 @@
-/**
- * no-large-functions rule
- *
- * Detects functions that exceed a configurable line threshold.
- */
-
+import { RULES } from "@/rules/constants";
+import { DEFAULT_MAX_LINES } from "@/rules/implementations/no-large-functions/consts";
 import { getFunctionLineCount, getFunctionName, getFunctions } from "@/utils/ast-helpers";
 
 import type { ScannedFile } from "@/core/scanner";
 import type { Finding, FindingId } from "@/findings/types";
-import type { Rule, RuleContext, RuleId, RuleResult } from "@/rules/types";
-
-export const DEFAULT_MAX_LINES = 50;
-
-export interface NoLargeFunctionsConfig {
-  maxLines?: number;
-}
+import type { NoLargeFunctionsConfig } from "@/rules/implementations/no-large-functions/types";
 
 export function checkNoLargeFunctions(
   file: ScannedFile,
@@ -35,7 +25,7 @@ export function checkNoLargeFunctions(
 
       findings.push({
         id: `${file.relativePath}:large-func:${findingId++}` as FindingId,
-        ruleId: "no-large-functions" as RuleId,
+        ruleId: RULES.NO_LARGE_FUNCTIONS,
         severity: "warning",
         title: name
           ? `Function "${name}" is too large (${lineCount} lines)`
@@ -55,28 +45,3 @@ export function checkNoLargeFunctions(
 
   return findings;
 }
-
-export const noLargeFunctionsRule: Rule = {
-  id: "no-large-functions" as RuleId,
-  name: "No large functions",
-  description: "Flag functions whose line count exceeds the configured threshold.",
-  defaultConfig: {
-    enabled: true,
-    options: { maxLines: DEFAULT_MAX_LINES },
-  },
-  check(context: RuleContext): RuleResult {
-    const file = {
-      sourceFile: context.sourceFile,
-      relativePath: context.filePath,
-      absolutePath: context.filePath,
-      lineCount: context.sourceFile.getEndLineNumber(),
-    };
-
-    const optionValue = context.config.options?.maxLines;
-    const maxLines = typeof optionValue === "number" ? optionValue : DEFAULT_MAX_LINES;
-
-    return {
-      findings: checkNoLargeFunctions(file, { maxLines }),
-    };
-  },
-};
