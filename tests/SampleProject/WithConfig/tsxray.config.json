@@ -33,6 +33,12 @@
           "maxCount": 1
         }
       }
+    },
+    "no-unused-files": {
+      "options": {
+        "entryPoints": ["configured-root.ts", "hub.ts"],
+        "excludedFiles": ["configured-generated.ts"]
+      }
     }
   }
 }

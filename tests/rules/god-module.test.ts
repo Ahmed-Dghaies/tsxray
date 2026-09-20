@@ -17,7 +17,7 @@ describe("god-module rule via CLI scan", () => {
 
     cliQuerier.validateScanFoundRules(result, "god-module", [
       {
-        id: "hub.ts:god-module:1" as FindingId,
+        id: "hub.ts:god-module:0" as FindingId,
         ruleId: RULES.GOD_MODULE,
         severity: "warning",
         title: "Module exhibits 3 God Module signals",
