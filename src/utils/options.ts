@@ -6,6 +6,10 @@ export function positiveInteger(value: unknown, fallback: number): number {
   return Number.isInteger(value) && (value as number) > 0 ? (value as number) : fallback;
 }
 
+export function nonNegativeInteger(value: unknown, fallback: number): number {
+  return Number.isInteger(value) && (value as number) >= 0 ? (value as number) : fallback;
+}
+
 export function booleanOption(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
