@@ -17,6 +17,7 @@ export function analyze(scanResult: ScanResult, options: AnalyzeOptions = {}): F
   const { verbose } = options;
   const findings: Finding[] = [];
   const config = loadConfig(scanResult.rootPath);
+  const projectSourceFiles = scanResult.files.map((file) => file.sourceFile);
 
   if (verbose) {
     console.log(`[Analyzer] Analyzing ${scanResult.files.length} files...`);
@@ -34,6 +35,7 @@ export function analyze(scanResult: ScanResult, options: AnalyzeOptions = {}): F
 
       const result = rule.check({
         sourceFile: file.sourceFile,
+        projectSourceFiles,
         filePath: file.relativePath,
         config: {
           enabled,

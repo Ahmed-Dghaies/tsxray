@@ -4,6 +4,7 @@
  * Add your rules here as you create them
  */
 
+import { godModuleRule } from "@/rules/implementations/god-module";
 import { noLargeFunctionsRule } from "@/rules/implementations/no-large-functions";
 
 import type { Rule } from "@/rules/types";
@@ -11,4 +12,4 @@ import type { Rule } from "@/rules/types";
 /**
  * All built-in rules
  */
-export const builtInRules: Rule[] = [noLargeFunctionsRule];
+export const builtInRules: Rule[] = [noLargeFunctionsRule, godModuleRule];

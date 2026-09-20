@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { expect } from "vitest";
 
-import type { FindingsResult } from "@/findings/types";
+import type { Finding, FindingsResult, Severity } from "@/findings/types";
 
 export class CliQuerier {
   constructor(private readonly repoRoot = this.getRepoRoot()) {}
@@ -44,19 +44,39 @@ export class CliQuerier {
     });
   }
 
-  public validateScanFoundRules(result: FindingsResult, expectedRuleIds: string[] = []): void {
-    expect(result.summary.total).toBeGreaterThanOrEqual(expectedRuleIds.length);
+  public validateScanFoundRules(
+    result: FindingsResult,
+    expectedRuleId: string,
+    expectedFindings: Finding[],
+  ): void {
+    const findings = result.findings.filter((finding) => finding.ruleId === expectedRuleId);
+    const bySeverity: Record<Severity, number> = {
+      error: 0,
+      warning: 0,
+      info: 0,
+      hint: 0,
+    };
 
-    if (expectedRuleIds.length > 0) {
-      expect(result.findings).toEqual(
-        expect.arrayContaining(
-          expectedRuleIds.map((ruleId) =>
-            expect.objectContaining({
-              ruleId,
-            }),
-          ),
-        ),
-      );
+    for (const finding of findings) {
+      bySeverity[finding.severity]++;
     }
+
+    expect(findings).toStrictEqual(expectedFindings);
+    expect(result.summary.byRule[expectedRuleId] ?? 0).toBe(findings.length);
+    expect({
+      total: findings.length,
+      bySeverity,
+      byRule: findings.length > 0 ? { [expectedRuleId]: findings.length } : {},
+    }).toStrictEqual({
+      total: expectedFindings.length,
+      bySeverity: expectedFindings.reduce<Record<Severity, number>>(
+        (summary, finding) => {
+          summary[finding.severity]++;
+          return summary;
+        },
+        { error: 0, warning: 0, info: 0, hint: 0 },
+      ),
+      byRule: expectedFindings.length > 0 ? { [expectedRuleId]: expectedFindings.length } : {},
+    });
   }
 }

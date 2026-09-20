@@ -5,6 +5,27 @@
       "options": {
         "maxLines": 5
       }
+    },
+    "god-module": {
+      "options": {
+        "requiredSignals": 3,
+        "size": {
+          "enabled": true,
+          "maxLines": 15,
+          "maxDeclarations": 3,
+          "maxFunctionsAndClasses": 3,
+          "maxExports": 3,
+          "requiredMetrics": 2
+        },
+        "dependencies": {
+          "enabled": true,
+          "maxCount": 2
+        },
+        "dependents": {
+          "enabled": true,
+          "maxCount": 1
+        }
+      }
     }
   }
 }
