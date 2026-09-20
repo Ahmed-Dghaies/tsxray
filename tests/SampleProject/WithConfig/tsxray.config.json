@@ -6,6 +6,13 @@
         "maxLines": 5
       }
     },
+    "no-deep-nesting": {
+      "enabled": true,
+      "options": {
+        "maxDepth": 2,
+        "excludedConstructs": ["try", "callback"]
+      }
+    },
     "god-module": {
       "options": {
         "requiredSignals": 3,
