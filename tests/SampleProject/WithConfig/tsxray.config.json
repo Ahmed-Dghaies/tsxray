@@ -39,6 +39,12 @@
         "entryPoints": ["configured-root.ts", "hub.ts"],
         "excludedFiles": ["configured-generated.ts"]
       }
+    },
+    "no-unused-vars": {
+      "options": {
+        "args": "all",
+        "varsIgnorePattern": "^ignored"
+      }
     }
   }
 }

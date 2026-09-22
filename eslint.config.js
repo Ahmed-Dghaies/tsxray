@@ -39,7 +39,16 @@ export default tseslint.config(
       "import-x/order": [
         "error",
         {
-          groups: ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+            "object",
+            "type",
+          ],
           pathGroups: [
             {
               pattern: "@/**",
@@ -57,6 +66,16 @@ export default tseslint.config(
       "import-x/newline-after-import": "error",
       "import-x/no-duplicates": "error",
       "import-x/no-unresolved": "error",
+    },
+  },
+  {
+    files: [
+      "tests/SampleProject/WithConfig/configured-unused-vars.ts",
+      "tests/SampleProject/WithoutConfig/disabled-unused-vars.ts",
+      "tests/SampleProject/WithoutConfig/unused-vars.ts",
+    ],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",
     },
   },
 );
