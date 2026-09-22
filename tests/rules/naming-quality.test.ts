@@ -43,7 +43,8 @@ describe("naming-quality rule via CLI scan", () => {
         ruleId: RULES.NAMING_QUALITY,
         severity: "warning",
         title: 'Identifier "usersArray" exposes its implementation type',
-        message: '"usersArray" exposes the implementation type in the identifier. Consider "users".',
+        message:
+          '"usersArray" exposes the implementation type in the identifier. Consider "users".',
         filePath: "",
         symbolName: "usersArray",
         range: { startLine: 4, startColumn: 0, endLine: 4, endColumn: 0 },
@@ -90,6 +91,17 @@ describe("naming-quality rule via CLI scan", () => {
         filePath: "",
         symbolName: "click",
         range: { startLine: 20, startColumn: 0, endLine: 20, endColumn: 0 },
+      },
+      {
+        id: ":naming-quality:boolean:7" as FindingId,
+        ruleId: RULES.NAMING_QUALITY,
+        severity: "warning",
+        title: 'Boolean identifier "state" has a vague name',
+        message:
+          'Boolean identifier "state" has a vague name. Consider a name that describes the boolean state or condition.',
+        filePath: "",
+        symbolName: "state",
+        range: { startLine: 26, startColumn: 0, endLine: 26, endColumn: 0 },
       },
     ]);
   });

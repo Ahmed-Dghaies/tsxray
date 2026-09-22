@@ -1,4 +1,4 @@
-export interface NamingQualityOptions {
+export interface NamingQualityOptions extends Record<string, unknown> {
   boolean: boolean;
   negativeBoolean: boolean;
   booleanFunction: boolean;

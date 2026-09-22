@@ -21,3 +21,10 @@ const click = () => {};
 const handleChange = () => {};
 
 void [flag, loading, isNotDisabled, usersArray, user, process, result, data, click, handleChange];
+
+class SessionState {
+  state = true;
+  visible = false;
+}
+
+void SessionState;

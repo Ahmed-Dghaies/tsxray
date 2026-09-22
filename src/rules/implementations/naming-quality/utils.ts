@@ -8,14 +8,23 @@ import type {
   NamingQualityOptions,
 } from "@/rules/implementations/naming-quality/types";
 import type {
-  FunctionLikeDeclaration,
+  ArrowFunction,
+  FunctionDeclaration,
+  FunctionExpression,
   Identifier,
+  MethodDeclaration,
   Node as MorphNode,
   ParameterDeclaration,
   SourceFile,
   Type,
   VariableDeclaration,
 } from "ts-morph";
+
+type NamingFunctionNode =
+  | FunctionDeclaration
+  | MethodDeclaration
+  | ArrowFunction
+  | FunctionExpression;
 
 const CLEAR_BOOLEAN_ADJECTIVES = new Set([
   "active",
@@ -38,11 +47,47 @@ const CLEAR_BOOLEAN_ADJECTIVES = new Set([
 ]);
 const PREDICATE_WORDS = /^(contains|exists|supports|matches|equals|includes)([A-Z]|$)/;
 const GENERIC_FUNCTION_NAMES = new Set(["user", "users", "data", "result", "value"]);
-const EVENT_NAMES = new Set(["click", "change", "submit", "input", "focus", "blur", "keydown", "keyup"]);
-const CALLBACK_METHODS = new Set(["map", "filter", "reduce", "sort", "forEach", "find", "some", "every"]);
-const CONVENTIONAL_CALLBACK_NAMES = new Set(["item", "value", "x", "a", "b", "acc", "index", "key"]);
+const EVENT_NAMES = new Set([
+  "click",
+  "change",
+  "submit",
+  "input",
+  "focus",
+  "blur",
+  "keydown",
+  "keyup",
+]);
+const CALLBACK_METHODS = new Set([
+  "map",
+  "filter",
+  "reduce",
+  "sort",
+  "forEach",
+  "find",
+  "some",
+  "every",
+]);
+const CONVENTIONAL_CALLBACK_NAMES = new Set([
+  "item",
+  "value",
+  "x",
+  "a",
+  "b",
+  "acc",
+  "index",
+  "key",
+]);
 const KNOWN_ABBREVIATIONS = new Set(["usr", "cfg", "btn", "mgr", "req", "res", "ctx", "err"]);
-const SUFFIXES = ["Boolean", "Bool", "String", "Number", "Array", "Object", "Function", "Map"] as const;
+const SUFFIXES = [
+  "Boolean",
+  "Bool",
+  "String",
+  "Number",
+  "Array",
+  "Object",
+  "Function",
+  "Map",
+] as const;
 
 export function parseNamingQualityOptions(
   options: Record<string, unknown> = {},
@@ -123,12 +168,9 @@ function isPluralLooking(name: string): boolean {
   return name.length > 3 && name.endsWith("s") && !name.endsWith("ss");
 }
 
-function isShortCallbackParameter(
-  parameter: ParameterDeclaration,
-  maxLines: number,
-): boolean {
-  const functionNode = parameter.getFirstAncestor((ancestor) =>
-    Node.isArrowFunction(ancestor) || Node.isFunctionExpression(ancestor),
+function isShortCallbackParameter(parameter: ParameterDeclaration, maxLines: number): boolean {
+  const functionNode = parameter.getFirstAncestor(
+    (ancestor) => Node.isArrowFunction(ancestor) || Node.isFunctionExpression(ancestor),
   );
   const call = functionNode?.getParentIfKind(SyntaxKind.CallExpression);
   const expression = call?.getExpression();
@@ -150,7 +192,9 @@ function isContextualVagueVariable(declaration: VariableDeclaration): boolean {
 
   if (name === "result" && initializer && Node.isAwaitExpression(initializer)) {
     const expression = initializer.getExpression();
-    return Node.isCallExpression(expression) && expression.getExpression().getText() === "Promise.all";
+    return (
+      Node.isCallExpression(expression) && expression.getExpression().getText() === "Promise.all"
+    );
   }
 
   if (name === "data" && initializer && Node.isPropertyAccessExpression(initializer)) {
@@ -160,9 +204,10 @@ function isContextualVagueVariable(declaration: VariableDeclaration): boolean {
   return false;
 }
 
-function getFunctionNameNode(node: FunctionLikeDeclaration): Identifier | undefined {
+function getFunctionNameNode(node: NamingFunctionNode): Identifier | undefined {
   if (Node.isFunctionDeclaration(node) || Node.isMethodDeclaration(node)) {
-    return node.getNameNode();
+    const nameNode = node.getNameNode();
+    return nameNode && Node.isIdentifier(nameNode) ? nameNode : undefined;
   }
 
   const parent = node.getParent();
@@ -177,7 +222,7 @@ function getFunctionNameNode(node: FunctionLikeDeclaration): Identifier | undefi
   return undefined;
 }
 
-function getBooleanReturnType(node: FunctionLikeDeclaration): Type | undefined {
+function getBooleanReturnType(node: NamingFunctionNode): Type | undefined {
   try {
     if (Node.isFunctionDeclaration(node) || Node.isMethodDeclaration(node)) {
       return node.getReturnType();
@@ -270,7 +315,7 @@ function inspectTypedIdentifier(
   if (options.typeSuffixes) {
     const suffix = SUFFIXES.find((candidate) => name.endsWith(candidate));
     const suffixMatchesType =
-      (suffix === "Boolean" || suffix === "Bool")
+      suffix === "Boolean" || suffix === "Bool"
         ? booleanType
         : suffix === "String"
           ? type.isString() || type.isStringLiteral()
@@ -282,7 +327,8 @@ function inspectTypedIdentifier(
                 ? isFunctionType(type)
                 : suffix === "Map"
                   ? type.getSymbol()?.getName() === "Map"
-                  : suffix === "Object" && ["configObject", "dataObject", "valueObject", "resultObject"].includes(name);
+                  : suffix === "Object" &&
+                    ["configObject", "dataObject", "valueObject", "resultObject"].includes(name);
 
     if (suffix && suffixMatchesType) {
       const suggestion = name.slice(0, -suffix.length);
@@ -296,7 +342,10 @@ function inspectTypedIdentifier(
     }
   }
 
-  if (options.collectionNames && (Node.isVariableDeclaration(declaration) || Node.isParameterDeclaration(declaration))) {
+  if (
+    options.collectionNames &&
+    (Node.isVariableDeclaration(declaration) || Node.isParameterDeclaration(declaration))
+  ) {
     const collection = isCollectionType(type);
     const plural = isPluralLooking(name);
     if (collection && !plural && !["data", "config", "children"].includes(lowerName)) {
@@ -371,7 +420,7 @@ function inspectTypedIdentifier(
 }
 
 function inspectFunction(
-  node: FunctionLikeDeclaration,
+  node: NamingFunctionNode,
   options: NamingQualityOptions,
   diagnostics: NamingDiagnostic[],
 ): void {
@@ -402,7 +451,11 @@ function inspectFunction(
     return;
   }
 
-  if (options.eventHandlers && EVENT_NAMES.has(name.toLowerCase()) && !matchesPattern(name, options.eventHandlerPatterns)) {
+  if (
+    options.eventHandlers &&
+    EVENT_NAMES.has(name.toLowerCase()) &&
+    !matchesPattern(name, options.eventHandlerPatterns)
+  ) {
     addDiagnostic(diagnostics, nameNode, {
       problem: "event-handler",
       name,
@@ -429,7 +482,12 @@ export function analyzeNamingQuality(
   const diagnostics: NamingDiagnostic[] = [];
 
   sourceFile.forEachDescendant((node) => {
-    if (Node.isVariableDeclaration(node) || Node.isParameterDeclaration(node)) {
+    if (
+      Node.isVariableDeclaration(node) ||
+      Node.isParameterDeclaration(node) ||
+      Node.isPropertyDeclaration(node) ||
+      Node.isPropertySignature(node)
+    ) {
       const nameNode = node.getNameNode();
       if (Node.isIdentifier(nameNode)) {
         inspectTypedIdentifier(nameNode, node, options, diagnostics);
