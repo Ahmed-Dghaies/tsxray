@@ -5,6 +5,7 @@
  */
 
 import { godModuleRule } from "@/rules/implementations/god-module";
+import { namingQualityRule } from "@/rules/implementations/naming-quality";
 import { noDeepNestingRule } from "@/rules/implementations/no-deep-nesting";
 import { noLargeFunctionsRule } from "@/rules/implementations/no-large-functions";
 import { noUnusedFilesRule } from "@/rules/implementations/no-unused-files";
@@ -21,4 +22,5 @@ export const builtInRules: Rule[] = [
 	noDeepNestingRule,
 	noUnusedFilesRule,
 	noUnusedVarsRule,
+	namingQualityRule,
 ];
