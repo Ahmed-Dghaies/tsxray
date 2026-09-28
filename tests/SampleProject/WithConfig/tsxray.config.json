@@ -45,6 +45,23 @@
         "args": "all",
         "varsIgnorePattern": "^ignored"
       }
+    },
+    "naming-quality": {
+      "options": {
+        "negativeBoolean": false,
+        "booleanFunction": false,
+        "valueFunctions": false,
+        "booleanNames": ["permitted"],
+        "vagueNames": false,
+        "genericParameterNames": ["payload"],
+        "typeSuffixes": false,
+        "abbreviations": true,
+        "acceptedAbbreviations": ["cfg"],
+        "eventHandlers": true,
+        "eventHandlerPatterns": ["^on[A-Z]"],
+        "collectionNames": false,
+        "callbackParameterMaxLines": 2
+      }
     }
   }
 }
